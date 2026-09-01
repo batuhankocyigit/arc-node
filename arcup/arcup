@@ -750,7 +750,14 @@ main() {
 
     mkdir -p "$BIN_DIR"
 
+    # The archive is downloaded into TMP_DIR and also extracted there before
+    # the binaries are copied to BIN_DIR, so TMP_DIR briefly holds both the
+    # compressed archive and its extracted contents (~2x the final install
+    # size). TMP_DIR (from mktemp -d, usually /tmp) is frequently a
+    # different filesystem than BIN_DIR — e.g. a small tmpfs in containers —
+    # so it needs its own check rather than relying on the BIN_DIR check.
     check_disk_space "$BIN_DIR"
+    check_disk_space "$TMP_DIR" 1000
 
     PLATFORM=$(detect_platform)
     ARCH=$(detect_arch)

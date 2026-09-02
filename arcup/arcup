@@ -324,7 +324,7 @@ download_file() {
         return
     fi
 
-    if ! curl_with_headers -#fL --max-time 900 -o "$output_path" "$url"; then
+    if ! curl_with_headers -#fL --max-time 900 -o "$output_path" "$url" || [[ ! -s "$output_path" ]]; then
         rm -f "$output_path"
         download_error "$tag" "$filename" "$url"
     fi
@@ -350,7 +350,7 @@ download_file_with_github_api() {
     download_url=$(resolve_github_asset_download_url "$asset_api_url") || return 1
 
     if curl "${CURL_RETRY_ARGS[@]}" -fL --max-time 900 -o "$output_path" "$download_url" >/dev/null 2>&1; then
-        [[ -f "$output_path" ]] && return 0
+        [[ -s "$output_path" ]] && return 0
     fi
 
     rm -f "$output_path"
@@ -374,7 +374,7 @@ download_file_with_gh() {
             --dir "$output_dir" \
             --clobber \
             >/dev/null 2>&1; then
-        [[ -f "$output_path" ]] && return 0
+        [[ -s "$output_path" ]] && return 0
     fi
 
     rm -f "$output_path"
